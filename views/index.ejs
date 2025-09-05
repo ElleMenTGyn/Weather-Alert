@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Vai chover amanhã?</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body>
+  <h1>Vai chover amanhã?</h1>
+
+  <form method="post" action="/consulta">
+    <label for="city">Cidade</label>
+    <input id="city" name="city" type="text" placeholder="Ex.: Goiânia"
+      value="<%= (model && model.city && model.city.query) ? model.city.query : '' %>" required />
+    <button type="submit">Consultar</button>
+  </form>
+
+  <% if (error) { %>
+    <div class="error">
+      <%= error %>
+    </div>
+    <% } %>
+
+      <% if (model) { %>
+        <% function formatISO(dateStr){ try { var p=dateStr.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+          catch(e){ return dateStr; } } %>
+
+          <section class="result">
+            <h2>
+              <%= model.city.name %>, <%= model.city.country %>
+            </h2>
+            <p><strong>Data:</strong>
+              <%= formatISO(model.forecast.date) %> (amanhã)
+            </p>
+            <p><strong>Probabilidade (máx.):</strong>
+              <%= model.forecast.precipitation_probability_max %>%
+            </p>
+            <p><strong>Regra:</strong> ≥ <%= model.forecast.threshold %>%</p>
+
+            <% if (model.forecast.willRain) { %>
+              <p class="ok">Vai chover amanhã. Leve guarda-chuva ☔</p>
+              <% } else { %>
+                <p class="warn">Pouca chance de chuva amanhã.</p>
+                <% } %>
+          </section>
+          <% } %>
+          <script>
+            // remove a querystring (?city=...) da barra de endereço sem recarregar
+            if (window.location.search) {
+              const clean = window.location.pathname; // mantém o mesmo path (ex.: "/")
+              window.history.replaceState({}, document.title, clean);
+
+              // opcional: já limpa o campo visualmente também
+              // document.getElementById('city')?.value = '';
+            }
+           </script>
+</body>
+
+</html>
